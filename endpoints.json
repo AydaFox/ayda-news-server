@@ -42,5 +42,21 @@
               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         }
     }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves all comments for the article, requested by ID",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 1,
+          "author": "weegembump",
+          "body": "Text from the comment..",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 0,
+          "article_id": 2
+        }
+      ]
+    }
   }
 }
