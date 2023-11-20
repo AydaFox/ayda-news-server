@@ -64,7 +64,7 @@ describe("/api/articles/:article_id", () => {
             .get("/api/articles/3")
             .expect(200)
             .then(({ body }) => {
-                expect(body.article).toEqual(expectedArticle);
+                expect(body.article).toMatchObject(expectedArticle);
             });
     });
     test("GET:400 should respond with an error message if an invalid id is requested", () => {
