@@ -1,6 +1,6 @@
 const express = require("express");
-const { getTopics, handleFourOhFour } = require("./controllers/topics.controllers");
-const { handleServerErrors } = require("./errors/errors");
+const { getTopics } = require("./controllers/topics.controllers");
+const { handleServerErrors, handleFourOhFour } = require("./errors/errors");
 
 const app = express();
 
