@@ -25,7 +25,12 @@ describe("/api/topics", () => {
                 });
             });
     });
-    test("", () => {
-        
+    test("GET:404 should respond with an appropriate message if an incorrect endpoint path is submitted", () => {
+        return request(app)
+            .get("/api/silly-fish")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("path not found");
+            });
     });
 });

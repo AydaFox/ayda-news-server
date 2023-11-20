@@ -5,3 +5,7 @@ exports.getTopics = (req, res, next) => {
         res.status(200).send({ topics });
     });
 }
+
+exports.handleFourOhFour = (req, res, next) => {
+    res.status(404).send({ msg: "path not found" });
+}
