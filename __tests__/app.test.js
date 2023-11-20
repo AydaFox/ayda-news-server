@@ -3,7 +3,7 @@ const app = require("../app.js");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const testData = require("../db/data/test-data");
-const fs = require("fs/promises");
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => {
     return seed(testData);
@@ -42,12 +42,7 @@ describe("/api", () => {
             .get("/api")
             .expect(200)
             .then(({ body }) => {
-                const readFile = fs.readFile(`${__dirname}/../endpoints.json`);
-                return Promise.all([body.api, readFile]);
-            })
-            .then(([api, fileContents]) => {
-                const apiData = JSON.parse(fileContents);
-                expect(api).toEqual(apiData);
+                expect(body.api).toEqual(endpoints);
             });
     });
 });
