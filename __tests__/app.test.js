@@ -3,6 +3,7 @@ const app = require("../app.js");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const testData = require("../db/data/test-data");
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => {
     return seed(testData);
@@ -31,6 +32,17 @@ describe("/api/topics", () => {
             .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("path not found");
+            });
+    });
+});
+
+describe("/api", () => {
+    test("GET:200 responds with an object describing all the available endpoints", () => {
+        return request(app)
+            .get("/api")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.api).toEqual(endpoints);
             });
     });
 });
