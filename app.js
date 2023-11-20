@@ -6,8 +6,6 @@ const { getArticles } = require("./controllers/articles.controllers");
 
 const app = express();
 
-app.use(express.json());
-
 app.get("/api", getApi);
 
 app.get("/api/topics", getTopics);

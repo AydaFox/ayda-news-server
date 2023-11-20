@@ -48,13 +48,14 @@ describe("/api", () => {
 });
 
 describe("/api/articles", () => {
-    test("GET:200 should respond with an articles array of article objects, with the correct properties", () => {
+    test("GET:200 should respond with an articles array of article objects, with the correct properties and defaulted to ordering by date in descending order", () => {
         return request(app)
             .get("/api/articles")
             .expect(200)
             .then(({ body }) => {
                 const { articles } = body;
                 expect(articles).toHaveLength(13);
+                expect(articles).toBeSortedBy("created_at", { descending: true });
                 articles.forEach((article) => {
                     expect(typeof article.author).toBe("string");
                     expect(typeof article.title).toBe("string");
@@ -64,6 +65,10 @@ describe("/api/articles", () => {
                     expect(typeof article.votes).toBe("number");
                     expect(typeof article.article_img_url).toBe("string");
                     expect(typeof article.comment_count).toBe("string");
+                    expect(typeof article.body).toBe("undefined");
+                    if (article.article_id === 1) {
+                        expect(article.comment_count).toBe("11");
+                    }
                 });
             });
     });
