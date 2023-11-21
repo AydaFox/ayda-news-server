@@ -79,6 +79,9 @@ describe("/api/articles", () => {
                 .expect(200)
                 .then(({ body }) => {
                     expect(body.articles).toHaveLength(12);
+                    body.articles.forEach((article) => {
+                        expect(article.topic).toBe("mitch");
+                    });
                 });
         });
         test("GET:200 should respond with an empty array if no articles exist for that topic", () => {

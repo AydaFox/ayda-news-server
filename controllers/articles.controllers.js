@@ -5,11 +5,14 @@ exports.getArticles = (req, res, next) => {
     const { topic } = req.query;
 
     const promisesArray = [
-        selectArticles(topic),
         topic? checkExists("topics", "slug", topic) : "no topic query",
     ];
 
-    Promise.all(promisesArray).then(([articles]) => {
+    Promise.all(promisesArray)
+    .then(() => {
+        return selectArticles(topic);
+    })
+    .then((articles) => {
         res.status(200).send({ articles });
     })
     .catch(next);
