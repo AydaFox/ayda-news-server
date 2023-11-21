@@ -131,6 +131,14 @@ describe("/api/articles/:article_id/comments", () => {
                 });
             });
     });
+    test("GET:200 should respond with an empty array if the requested article exists, but has no comments", () => {
+        return request(app)
+            .get("/api/articles/8/comments")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comments).toEqual([]);
+            });
+    });
     test("GET:400 should respond with an error if the article ID is invalid", () => {
         return request(app)
             .get("/api/articles/soggy_socks/comments")
