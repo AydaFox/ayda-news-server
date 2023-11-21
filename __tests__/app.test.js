@@ -111,3 +111,27 @@ describe("/api/articles/:article_id", () => {
             });
     });
 });
+
+xdescribe("/api/articles/:article_id/comments", () => {
+    test("POST:201 should respond with the posted comment", () => {
+        const newComment = {
+            username: 'icellusedkars',
+            body: 'what a crazy comment I just left lol'
+        };
+        const expectedResponse = {
+            comment_id: 19,
+            votes: 0,
+            author: 'icellusedkars',
+            body: 'what a crazy comment I just left lol',
+            article_id: 2
+        }
+        return request(app)
+            .post("/api/articles/2/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.comment).toMatchObject(expectedResponse);
+                expect(typeof body.comment.created_at).toBe("string");
+            })
+    });
+});

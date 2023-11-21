@@ -14,6 +14,11 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 
+app.post("/api/articles/:article_id/comments")
+// update extensions.json
+// check prev pull request for error updates
+// look into how the dates get added for comments > utils folder!!!
+
 app.all("*", handleFourOhFour);
 
 app.use(handlePsqlErrors);
