@@ -226,6 +226,102 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(body.msg).toBe("article not found");
             });
     });
+    test("POST:201 should respond with the posted comment", () => {
+        const timestamp = (new Date).toString();
+        const newComment = {
+            username: 'icellusedkars',
+            body: 'what a crazy comment I just left lol'
+        };
+        const expectedResponse = {
+            comment_id: 19,
+            votes: 0,
+            author: 'icellusedkars',
+            body: 'what a crazy comment I just left lol',
+            article_id: 2
+        }
+        return request(app)
+            .post("/api/articles/2/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.comment).toMatchObject(expectedResponse);
+                expect(new Date(body.comment.created_at).toString()).toBe(timestamp);
+            });
+    });
+    test("POST:201 should respond with the posted comment, any unnecessary properties should be ignored", () => {
+        const timestamp = (new Date).toString();
+        const newComment = {
+            username: 'icellusedkars',
+            body: 'what a crazy comment I just left lol',
+            votes: '50 million!'
+        };
+        const expectedResponse = {
+            comment_id: 19,
+            votes: 0,
+            author: 'icellusedkars',
+            body: 'what a crazy comment I just left lol',
+            article_id: 2
+        }
+        return request(app)
+            .post("/api/articles/2/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.comment).toMatchObject(expectedResponse);
+                expect(new Date(body.comment.created_at).toString()).toBe(timestamp);
+            });
+    });
+    test("POST:400 should respond with an error message if an invalid id is sent to", () => {
+        const newComment = {
+            username: 'icellusedkars',
+            body: 'what a crazy comment I just left lol'
+        };
+        return request(app)
+            .post("/api/articles/lillypads/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("POST:400 should respond with an error message if an invalid body is sent", () => {
+        const newComment = {
+            body: 'what a crazy comment I just left lol'
+        };
+        return request(app)
+            .post("/api/articles/2/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("POST:404 should respond with an error message if the article doesn't exist", () => {
+        const newComment = {
+            username: 'icellusedkars',
+            body: 'what a crazy comment I just left lol'
+        };
+        return request(app)
+            .post("/api/articles/99/comments")
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("article not found");
+            });
+    });
+    test("POST:404 should respond with an error message if the username doesn't exist", () => {
+        const newComment = {
+            username: 'foxesrule20XX',
+            body: 'this is a totally unique comment'
+        };
+        return request(app)
+            .post("/api/articles/2/comments")
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("username not found");
+            });
+    });
 });
 
 describe("/api/comments/:comment_id", () => {
@@ -240,7 +336,6 @@ describe("/api/comments/:comment_id", () => {
                 expect(rows).toHaveLength(17);
             });
     });
-    // 400 invalid ID
     test("DELETE:400 should respond with an error if the comment ID is invalid", () => {
         return request(app)
             .delete("/api/comments/milkshake")
@@ -249,7 +344,6 @@ describe("/api/comments/:comment_id", () => {
                 expect(body.msg).toBe("bad request");
             });
     });
-    // 404 no comment found
     test("DELETE:404 should respond with an error if the comment doesn't exist", () => {
         return request(app)
             .delete("/api/comments/70")

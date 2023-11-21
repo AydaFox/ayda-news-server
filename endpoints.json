@@ -42,7 +42,7 @@
           "votes": 0,
           "article_img_url":
               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-        }
+      }
     }
   },
   "PATCH /api/articles/:article_id": {
@@ -77,6 +77,24 @@
           "article_id": 2
         }
       ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "creates a comment for the article specified by ID",
+    "queries": [],
+    "exampleRequest": {
+          "username": "bobbylonglegs",
+          "body": "The comment as text..."
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 1,
+        "votes": 0,
+        "created_at": "2018-05-30T15:59:13.341Z",
+        "author": "bobbylonglegs",
+        "body": "The comment as text...",
+        "article_id": 1
+      }
     }
   },
   "DELETE /api/comments/:comment_id": {
