@@ -29,7 +29,7 @@
     }
   },
   "GET /api/articles/:article_id": {
-    "description": "serves an article object with the requested ID",
+    "description": "serves an article object with the requested article ID",
     "queries": [],
     "exampleResponse": {
       "article": {
@@ -46,7 +46,7 @@
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "serves all comments for the article, requested by ID",
+    "description": "serves all comments for the article, requested by article ID",
     "queries": [],
     "exampleResponse": {
       "comments": [
@@ -60,5 +60,10 @@
         }
       ]
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes a comment by comment ID",
+    "queries": [],
+    "exampleResponse": "no content"
   }
 }
