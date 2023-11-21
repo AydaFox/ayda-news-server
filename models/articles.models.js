@@ -31,3 +31,21 @@ exports.selectArticleById = (article_id) => {
             }
         })
 }
+
+exports.updateArticleVotes = (article_id, inc_votes) => {
+    if (!inc_votes) {
+        return Promise.reject({ status: 400, msg: "bad request" })
+    }
+    return db.query(`
+            UPDATE articles
+            SET votes = votes + $1
+            WHERE article_id = $2
+            RETURNING *;`, [inc_votes, article_id])
+        .then(({ rows }) => {
+            if (!rows.length) {
+                return Promise.reject({ status: 404, msg: "article not found" });
+            } else {
+                return rows[0];
+            }
+        })
+}
