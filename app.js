@@ -4,6 +4,7 @@ const { handleServerErrors, handleFourOhFour, handlePsqlErrors, handleCustomErro
 const { getArticleById, getArticles, patchArticle } = require("./controllers/articles.controllers");
 const { getApi } = require("./controllers/api.controllers");
 const { getCommentsByArticleId, deleteComment } = require("./controllers/comments.controllers");
+const { getUsers } = require("./controllers/users.controllers");
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.patch("/api/articles/:article_id", patchArticle);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.delete("/api/comments/:comment_id", deleteComment);
+
+app.get("/api/users", getUsers);
 
 app.all("*", handleFourOhFour);
 

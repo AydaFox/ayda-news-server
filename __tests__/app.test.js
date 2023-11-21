@@ -240,7 +240,6 @@ describe("/api/comments/:comment_id", () => {
                 expect(rows).toHaveLength(17);
             });
     });
-    // 400 invalid ID
     test("DELETE:400 should respond with an error if the comment ID is invalid", () => {
         return request(app)
             .delete("/api/comments/milkshake")
@@ -249,13 +248,29 @@ describe("/api/comments/:comment_id", () => {
                 expect(body.msg).toBe("bad request");
             });
     });
-    // 404 no comment found
     test("DELETE:404 should respond with an error if the comment doesn't exist", () => {
         return request(app)
             .delete("/api/comments/70")
             .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("comment not found");
+            });
+    });
+});
+
+describe("/api/users", () => {
+    test("GET:200 should respond with an array of user objects, with the exected properties", () => {
+        return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then(({ body }) => {
+                const { users } = body;
+                expect(users).toHaveLength(4);
+                users.forEach((user) => {
+                    expect(typeof user.username).toBe("string");
+                    expect(typeof user.name).toBe("string");
+                    expect(typeof user.avatar_url).toBe("string");
+                });
             });
     });
 });
