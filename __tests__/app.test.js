@@ -74,8 +74,8 @@ describe("/api/articles", () => {
     });
 });
 
-describe("/api/articles/:article_id", () => {
-    test("GET:200 should respond with the correct article object", () => {
+describe.only("/api/articles/:article_id", () => {
+    test("GET:200 should respond with the correct article object, now with a comment count", () => {
         const expectedArticle = {
             article_id: 3,
             title: "Eight pug gifs that remind me of mitch",
@@ -86,6 +86,7 @@ describe("/api/articles/:article_id", () => {
             votes: 0,
             article_img_url:
               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "2"
           }
         return request(app)
             .get("/api/articles/3")
