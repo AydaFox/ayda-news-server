@@ -227,3 +227,35 @@ describe("/api/articles/:article_id/comments", () => {
             });
     });
 });
+
+describe("/api/comments/:comment_id", () => {
+    test("DELETE:204 should delete the given comment by ID", () => {
+        return request(app)
+            .delete("/api/comments/3")
+            .expect(204)
+            .then(() => {
+                return db.query(`SELECT * FROM comments;`)
+            })
+            .then(({ rows }) => {
+                expect(rows).toHaveLength(17);
+            });
+    });
+    // 400 invalid ID
+    test("DELETE:400 should respond with an error if the comment ID is invalid", () => {
+        return request(app)
+            .delete("/api/comments/milkshake")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    // 404 no comment found
+    test("DELETE:404 should respond with an error if the comment doesn't exist", () => {
+        return request(app)
+            .delete("/api/comments/70")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("comment not found");
+            });
+    });
+});
