@@ -72,6 +72,32 @@ describe("/api/articles", () => {
                 });
             });
     });
+    describe("?topic=", () => {
+        test("GET:200 should respond with an array of articles filtered by topic", () => {
+            return request(app)
+                .get("/api/articles?topic=mitch")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.articles).toHaveLength(12);
+                });
+        });
+        test("GET:200 should respond with an empty array if no articles exist for that topic", () => {
+            return request(app)
+                .get("/api/articles?topic=paper")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.articles).toEqual([]);
+                });
+        });
+        test("GET:404 should respond with an error message if no topic exists", () => {
+            return request(app)
+                .get("/api/articles?topic=dogs")
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("dogs not found");
+                });
+        });
+    });
 });
 
 describe("/api/articles/:article_id", () => {
@@ -319,7 +345,7 @@ describe("/api/articles/:article_id/comments", () => {
             .send(newComment)
             .expect(404)
             .then(({ body }) => {
-                expect(body.msg).toBe("username not found");
+                expect(body.msg).toBe("foxesrule20XX not found");
             });
     });
 });

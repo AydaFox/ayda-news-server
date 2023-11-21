@@ -34,7 +34,7 @@ exports.checkExists = (table, column, value) => {
     return db.query(formattedQuery, [value])
         .then(({ rows }) => {
             if (!rows.length){
-                return Promise.reject({ status: 404, msg: "username not found" });
+                return Promise.reject({ status: 404, msg: `${value} not found` });
             }
         });
 }
