@@ -112,8 +112,9 @@ describe("/api/articles/:article_id", () => {
     });
 });
 
-xdescribe("/api/articles/:article_id/comments", () => {
+describe("/api/articles/:article_id/comments", () => {
     test("POST:201 should respond with the posted comment", () => {
+        const timestamp = (new Date).toString();
         const newComment = {
             username: 'icellusedkars',
             body: 'what a crazy comment I just left lol'
@@ -131,7 +132,49 @@ xdescribe("/api/articles/:article_id/comments", () => {
             .expect(201)
             .then(({ body }) => {
                 expect(body.comment).toMatchObject(expectedResponse);
-                expect(typeof body.comment.created_at).toBe("string");
-            })
+                expect(new Date(body.comment.created_at).toString()).toBe(timestamp);
+            });
     });
+    // invalid article_id
+    test("POST:400 should respond with an error message if an invalid id is sent to", () => {
+        const newComment = {
+            username: 'icellusedkars',
+            body: 'what a crazy comment I just left lol'
+        };
+        return request(app)
+            .post("/api/articles/lillypads/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    // invalid request body
+    test("POST:400 should respond with an error message if an invalid body is sent", () => {
+        const newComment = {
+            body: 'what a crazy comment I just left lol'
+        };
+        return request(app)
+            .post("/api/articles/2/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    // article doesn't exist
+    test("POST:404 should respond with an error message if the article doesn't exist", () => {
+        const newComment = {
+            username: 'icellusedkars',
+            body: 'what a crazy comment I just left lol'
+        };
+        return request(app)
+            .post("/api/articles/99/comments")
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("article not found");
+            });
+    });
+
 });
