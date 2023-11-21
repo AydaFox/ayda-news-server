@@ -74,7 +74,7 @@ describe("/api/articles", () => {
     });
 });
 
-describe.only("/api/articles/:article_id", () => {
+describe("/api/articles/:article_id", () => {
     test("GET:200 should respond with the correct article object, now with a comment count", () => {
         const expectedArticle = {
             article_id: 3,
