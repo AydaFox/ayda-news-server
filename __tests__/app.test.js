@@ -113,6 +113,48 @@ describe("/api/articles/:article_id", () => {
 });
 
 describe("/api/articles/:article_id/comments", () => {
+    test("GET:200 should respond with an array of comments for the given article_id, most recent first, with the correct properties", () => {
+        return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(({ body }) => {
+                const { comments } = body;
+                expect(comments).toHaveLength(11);
+                expect(comments).toBeSortedBy("created_at", { descending: true });
+                comments.forEach((comment) => {
+                    expect(typeof comment.comment_id).toBe("number");
+                    expect(typeof comment.votes).toBe("number");
+                    expect(typeof comment.created_at).toBe("string");
+                    expect(typeof comment.author).toBe("string");
+                    expect(typeof comment.body).toBe("string");
+                    expect(typeof comment.article_id).toBe("number");
+                });
+            });
+    });
+    test("GET:200 should respond with an empty array if the requested article exists, but has no comments", () => {
+        return request(app)
+            .get("/api/articles/8/comments")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comments).toEqual([]);
+            });
+    });
+    test("GET:400 should respond with an error if the article ID is invalid", () => {
+        return request(app)
+            .get("/api/articles/soggy_socks/comments")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("GET:404 should respond with an error if the article doesn't exist", () => {
+        return request(app)
+            .get("/api/articles/99/comments")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("article not found");
+            });
+    });
     test("POST:201 should respond with the posted comment", () => {
         const timestamp = (new Date).toString();
         const newComment = {
@@ -135,7 +177,6 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(new Date(body.comment.created_at).toString()).toBe(timestamp);
             });
     });
-    // invalid article_id
     test("POST:400 should respond with an error message if an invalid id is sent to", () => {
         const newComment = {
             username: 'icellusedkars',
@@ -149,7 +190,6 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(body.msg).toBe("bad request");
             });
     });
-    // invalid request body
     test("POST:400 should respond with an error message if an invalid body is sent", () => {
         const newComment = {
             body: 'what a crazy comment I just left lol'
@@ -162,7 +202,6 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(body.msg).toBe("bad request");
             });
     });
-    // article doesn't exist
     test("POST:404 should respond with an error message if the article doesn't exist", () => {
         const newComment = {
             username: 'icellusedkars',
@@ -176,5 +215,4 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(body.msg).toBe("article not found");
             });
     });
-
 });

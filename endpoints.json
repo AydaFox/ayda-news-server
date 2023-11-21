@@ -45,6 +45,22 @@
       }
     }
   },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves all comments for the article, requested by ID",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 1,
+          "author": "weegembump",
+          "body": "Text from the comment..",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 0,
+          "article_id": 2
+        }
+      ]
+    }
+  },
   "POST /api/articles/:article_id/comments": {
     "description": "creates a comment for the article specified by ID",
     "queries": [],
