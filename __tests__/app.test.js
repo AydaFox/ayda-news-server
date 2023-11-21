@@ -110,6 +110,77 @@ describe("/api/articles/:article_id", () => {
                 expect(body.msg).toBe("article not found");
             });
     });
+    test("PATCH:200 should respond with the article, with it's votes increased", () => {
+        const voteChange = { inc_votes: 1 };
+        const expectedArticle = {
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 101,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          };
+        return request(app)
+            .patch("/api/articles/1")
+            .send(voteChange)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article).toMatchObject(expectedArticle)
+            });
+    });
+    test("PATCH:200 should respond with the article, with it's votes decreased, allows for negative votes", () => {
+        const voteChange = { inc_votes: -150 };
+        return request(app)
+            .patch("/api/articles/1")
+            .send(voteChange)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article.votes).toBe(-50);
+            });
+    });
+    test("PATCH:400 should respond with an error if the article ID is invalid", () => {
+        const voteChange = { inc_votes: 5 };
+        return request(app)
+            .patch("/api/articles/cows")
+            .send(voteChange)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("PATCH:400 should respond with an error if the request body has no inc_votes", () => {
+        const voteChange = { more_votes: 5 };
+        return request(app)
+            .patch("/api/articles/1")
+            .send(voteChange)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("PATCH:400 should respond with an error if inc_votes is invalid", () => {
+        const voteChange = { inc_votes: "five" };
+        return request(app)
+            .patch("/api/articles/1")
+            .send(voteChange)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("PATCH: 404 should respond with an error if the article doesn't exist", () => {
+        const voteChange = { inc_votes: 5 };
+        return request(app)
+            .patch("/api/articles/30")
+            .send(voteChange)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("article not found");
+            });
+    });
 });
 
 describe("/api/articles/:article_id/comments", () => {
@@ -249,6 +320,36 @@ describe("/api/articles/:article_id/comments", () => {
             .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("username not found");
+            });
+    });
+});
+
+describe("/api/comments/:comment_id", () => {
+    test("DELETE:204 should delete the given comment by ID", () => {
+        return request(app)
+            .delete("/api/comments/3")
+            .expect(204)
+            .then(() => {
+                return db.query(`SELECT * FROM comments;`)
+            })
+            .then(({ rows }) => {
+                expect(rows).toHaveLength(17);
+            });
+    });
+    test("DELETE:400 should respond with an error if the comment ID is invalid", () => {
+        return request(app)
+            .delete("/api/comments/milkshake")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("DELETE:404 should respond with an error if the comment doesn't exist", () => {
+        return request(app)
+            .delete("/api/comments/70")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("comment not found");
             });
     });
 });
