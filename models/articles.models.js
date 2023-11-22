@@ -1,6 +1,12 @@
 const db = require("../db/connection.js");
 
-exports.selectArticles = (topic) => {
+exports.selectArticles = (topic, sort_by) => {
+    
+    const validSorts = [ "article_id", "title", "topic", "author", "created_at", "votes" ];
+    if (sort_by && !validSorts.includes(sort_by)) {
+        return Promise.reject({});
+    }
+
     let queryString = `
             SELECT 
                 articles.article_id, 
@@ -19,7 +25,7 @@ exports.selectArticles = (topic) => {
     }
 
     queryString += `GROUP BY articles.article_id
-                    ORDER BY articles.created_at DESC;`
+                    ORDER BY articles.${sort_by || "created_at"} DESC;`
 
     return db.query(queryString)
         .then(({ rows }) => {

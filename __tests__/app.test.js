@@ -101,6 +101,18 @@ describe("/api/articles", () => {
                 });
         });
     });
+    describe("?sort_by=", () => {
+        test("GET:200 should respond with an array of all articles sorted by the requested column except for body or article_img_url, defaulted in descending order", () => {
+            return request(app)
+                .get("/api/articles?sort_by=author")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.articles).toHaveLength(13);
+                    expect(body.articles).toBeSortedBy("author", { descending: true })
+                });
+        });
+        // error testing here please!!! love you foxy, have a good Thursday <3
+    });
 });
 
 describe("/api/articles/:article_id", () => {
