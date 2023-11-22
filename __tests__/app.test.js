@@ -123,6 +123,14 @@ describe("/api/articles/:article_id", () => {
                 expect(body.article).toMatchObject(expectedArticle);
             });
     });
+    test("GET:200 should also respond with the correct comment count for the requested article", () => {
+        return request(app)
+            .get("/api/articles/3")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article.comment_count).toBe("2");
+            });
+    });
     test("GET:400 should respond with an error message if an invalid id is requested", () => {
         return request(app)
             .get("/api/articles/chickens")
