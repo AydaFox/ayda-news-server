@@ -18,9 +18,10 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles sorted by date, most recent first",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an array of all articles sorted by date, most recent first, with a default page limit of 10",
+    "queries": ["author", "topic", "sort_by", "order", "limit", "p"],
     "exampleResponse": {
+      "total_count": 1,
       "articles": [
         {
           "article_id": 1,
@@ -41,6 +42,7 @@
     "validQueries": "if the topic exists in the database, otherwise it will respond with a 404 error",
     "exampleQuery": "/api/articles?topic=cooking",
     "exampleResponse": {
+      "total_count": 1,
       "articles": [
         {
           "article_id": 1,
@@ -61,6 +63,7 @@
     "validQueries": ["article_id", "title", "topic", "author", "created_at", "votes"],
     "exampleQuery": "/api/articles?sort_by=article_id",
     "exampleResponse": {
+      "total_count": 2,
       "articles": [
         {
           "article_id": 2,
@@ -92,6 +95,7 @@
     "validQueries": ["asc", "desc"],
     "exampleQuery": "/api/articles?order=asc",
     "exampleResponse": {
+      "total_count": 2,
       "articles": [
         {
           "article_id": 1,
@@ -114,6 +118,59 @@
           "votes": 4,
           "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           "comment_count": 3
+        }
+      ]
+    }
+  },
+  "GET /api/articles?limit=": {
+    "description": "serves an array of articles with a requested page limit",
+    "validQueries": "any number",
+    "exampleQuery": "/api/articles?limit=2",
+    "exampleResponse": {
+      "total_count": 15,
+      "articles": [
+        {
+          "article_id": 2,
+          "title": "First time building a PC",
+          "topic": "technology",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2020-06-30T12:45:13.341Z",
+          "votes": 4,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": 3
+        },
+        {
+          "article_id": 1,
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 0,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": 6
+        }
+      ]
+    }
+  },
+  "GET /api/articles?p=": {
+    "description": "serves an array of articles from the requested page",
+    "validQueries": "any page number with articles populating it",
+    "exampleQuery": "/api/articles?p=2",
+    "exampleResponse": {
+      "total_count": 11,
+      "articles": [
+        {
+          "article_id": 1,
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 0,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": 6
         }
       ]
     }

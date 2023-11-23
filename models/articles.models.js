@@ -1,11 +1,14 @@
 const db = require("../db/connection.js");
 
-exports.selectArticles = (topic, sort_by, order) => {
+exports.selectArticles = (topic, sort_by, order, limit = 10, page = 1) => {
     const validSorts = [ "article_id", "title", "topic", "author", "created_at", "votes" ];
     const validOrder = [ "asc", "desc" ];
+    const validDigit = /^\d+$/;
     if (
         sort_by && !validSorts.includes(sort_by) || 
-        order && !validOrder.includes(order)
+        order && !validOrder.includes(order) || 
+        limit && !validDigit.test(limit) || 
+        page && !validDigit.test(page)
         ) {
         return Promise.reject({ status: 400, msg: "bad request" });
     }
@@ -23,16 +26,30 @@ exports.selectArticles = (topic, sort_by, order) => {
             FROM articles
             LEFT JOIN comments ON articles.article_id = comments.article_id `;
     
+    let topicString = ""
     if (topic) {
-        queryString += `WHERE topic = '${topic}' `;
+        topicString += `WHERE topic = '${topic}' `;
     }
+    queryString += topicString;
+
+    const offset = limit * (page-1);
 
     queryString += `GROUP BY articles.article_id
-                    ORDER BY articles.${sort_by || "created_at"} ${order || "DESC"};`;
-
+                    ORDER BY articles.${sort_by || "created_at"} ${order || "DESC"}
+                    LIMIT ${limit} 
+                    OFFSET ${offset};`;
+    
     return db.query(queryString)
         .then(({ rows }) => {
-            return rows;
+            const total_count = db.query(`SELECT * FROM articles ${topicString};`);
+            return Promise.all([rows, total_count]);
+        })
+        .then(( [articles, total_count] ) => {
+            if (total_count.rows.length < offset) {
+                return Promise.reject({ status: 404, msg: "articles not found" });
+            } else {
+                return [articles, total_count.rows.length ];
+            }
         });
 }
 

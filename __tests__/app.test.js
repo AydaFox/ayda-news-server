@@ -104,13 +104,13 @@ describe("/api", () => {
 });
 
 describe("/api/articles", () => {
-    test("GET:200 should respond with an articles array of article objects, with the correct properties and defaulted to ordering by date in descending order", () => {
+    test("GET:200 should respond with an articles array of article objects, with the correct properties and defaulted to ordering by date in descending order, limited to the default of the first 10", () => {
         return request(app)
             .get("/api/articles")
             .expect(200)
             .then(({ body }) => {
                 const { articles } = body;
-                expect(articles).toHaveLength(13);
+                expect(articles).toHaveLength(10);
                 expect(articles).toBeSortedBy("created_at", { descending: true });
                 articles.forEach((article) => {
                     expect(typeof article.author).toBe("string");
@@ -264,7 +264,8 @@ describe("/api/articles", () => {
                 .get("/api/articles?topic=mitch")
                 .expect(200)
                 .then(({ body }) => {
-                    expect(body.articles).toHaveLength(12);
+                    expect(body.total_count).toBe(12);
+                    expect(body.articles).toHaveLength(10);
                     body.articles.forEach((article) => {
                         expect(article.topic).toBe("mitch");
                     });
@@ -293,7 +294,8 @@ describe("/api/articles", () => {
                 .get("/api/articles?sort_by=author")
                 .expect(200)
                 .then(({ body }) => {
-                    expect(body.articles).toHaveLength(13);
+                    expect(body.total_count).toBe(13);
+                    expect(body.articles).toHaveLength(10);
                     expect(body.articles).toBeSortedBy("author", { descending: true });
                 });
         });
@@ -320,7 +322,8 @@ describe("/api/articles", () => {
                 .get("/api/articles?order=desc")
                 .expect(200)
                 .then(({ body }) => {
-                    expect(body.articles).toHaveLength(13);
+                    expect(body.total_count).toBe(13);
+                    expect(body.articles).toHaveLength(10);
                     expect(body.articles).toBeSortedBy("created_at", { descending: true });
                 });
         });
@@ -329,7 +332,8 @@ describe("/api/articles", () => {
                 .get("/api/articles?order=asc")
                 .expect(200)
                 .then(({ body }) => {
-                    expect(body.articles).toHaveLength(13);
+                    expect(body.total_count).toBe(13);
+                    expect(body.articles).toHaveLength(10);
                     expect(body.articles).toBeSortedBy("created_at", { descending: false });
                 });
         });
@@ -338,7 +342,8 @@ describe("/api/articles", () => {
                 .get("/api/articles?order=asc&sort_by=article_id")
                 .expect(200)
                 .then(({ body }) => {
-                    expect(body.articles).toHaveLength(13);
+                    expect(body.total_count).toBe(13);
+                    expect(body.articles).toHaveLength(10);
                     expect(body.articles).toBeSortedBy("article_id", { descending: false });
                 });
         });
@@ -348,6 +353,79 @@ describe("/api/articles", () => {
                 .expect(400)
                 .then(({ body }) => {
                     expect(body.msg).toBe("bad request");
+                });
+        });
+    });
+    describe("?limit=", () => {
+        test("GET:200 should respond with the first 10 articles (10 is the default)", ()=> {
+            return request(app)
+                .get("/api/articles?limit=10")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.total_count).toBe(13);
+                    expect(body.articles).toHaveLength(10);
+                });
+        });
+        test("GET:200 should respond with the first 10 articles (10 is the default)", ()=> {
+            return request(app)
+                .get("/api/articles?limit=5")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.total_count).toBe(13);
+                    expect(body.articles).toHaveLength(5);
+                });
+        });
+        test("GET:400 should respond with an error if the limit is invalid", () => {
+            return request(app)
+                .get("/api/articles?limit=ten")
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("bad request");
+                });
+        });
+    });
+    describe("?p=", () => {
+        test("GET:200 should respond with the first page (10 articles) as an array of articles", () => {
+            return request(app)
+                .get("/api/articles?p=1")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.total_count).toBe(13);
+                    expect(body.articles).toHaveLength(10);
+                });
+        });
+        test("GET:200 should respond with the second page as an array of articles", () => {
+            return request(app)
+                .get("/api/articles?p=2")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.total_count).toBe(13);
+                    expect(body.articles).toHaveLength(3);
+                });
+        });
+        test("GET:200 should respond with the 5th page of 2 articles if limit is 2", () => {
+            return request(app)
+                .get("/api/articles?p=5&limit=2")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.total_count).toBe(13);
+                    expect(body.articles).toHaveLength(2);
+                });
+        });
+        test("GET:400 should respond with an error if the page query is invalid", () => {
+            return request(app)
+                .get("/api/articles?p=twenty")
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("bad request");
+                });
+        });
+        test("GET:404 should respond with an error if their is nothing on the selected page", () => {
+            return request(app)
+                .get("/api/articles?p=20")
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("articles not found");
                 });
         });
     });
