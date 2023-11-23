@@ -47,7 +47,7 @@ describe("/api", () => {
     });
 });
 
-describe("/api/articles", () => {
+describe.only("/api/articles", () => {
     test("GET:200 should respond with an articles array of article objects, with the correct properties and defaulted to ordering by date in descending order", () => {
         return request(app)
             .get("/api/articles")
@@ -98,6 +98,70 @@ describe("/api/articles", () => {
                 .expect(404)
                 .then(({ body }) => {
                     expect(body.msg).toBe("dogs not found");
+                });
+        });
+    });
+    describe("?sort_by=", () => {
+        test("GET:200 should respond with an array of all articles sorted by the requested column except for body or article_img_url, defaulted in descending order", () => {
+            return request(app)
+                .get("/api/articles?sort_by=author")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.articles).toHaveLength(13);
+                    expect(body.articles).toBeSortedBy("author", { descending: true });
+                });
+        });
+        test("GET:400 should respond with an error message when given an invalid query of a column that doesn't exist", () => {
+            return request(app)
+                .get("/api/articles?sort_by=foxes")
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("bad request");
+                });
+        });
+        test("GET:400 should respond with an error message when given an invalid query of a column that does exist", () => {
+            return request(app)
+                .get("/api/articles?sort_by=body")
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("bad request");
+                });
+        });
+    });
+    describe("?order=", () => {
+        test("desc GET:200 should respond with an array of articles sorted by created_at in descending order", () => {
+            return request(app)
+                .get("/api/articles?order=desc")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.articles).toHaveLength(13);
+                    expect(body.articles).toBeSortedBy("created_at", { descending: true });
+                });
+        });
+        test("asc GET:200 should respond with an array of articles sorted by created_at in ascending order", () => {
+            return request(app)
+                .get("/api/articles?order=asc")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.articles).toHaveLength(13);
+                    expect(body.articles).toBeSortedBy("created_at", { descending: false });
+                });
+        });
+        test("asc&sort_by=article_id GET:200 should respond with an array of articles sorted by article_id in ascending order", () => {
+            return request(app)
+                .get("/api/articles?order=asc&sort_by=article_id")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.articles).toHaveLength(13);
+                    expect(body.articles).toBeSortedBy("article_id", { descending: false });
+                });
+        });
+        test("GET:400 should respond with an error message when given an invalid query", () => {
+            return request(app)
+                .get("/api/articles?order=down")
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("bad request");
                 });
         });
     });
