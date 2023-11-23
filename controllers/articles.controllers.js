@@ -1,5 +1,5 @@
 const { selectArticles, selectArticleById, updateArticleVotes } = require("../models/articles.models");
-const { checkExists } = require("../models/util.models");
+const { checkExists } = require("../models/utils.models");
 
 exports.getArticles = (req, res, next) => {
     const { topic, sort_by, order } = req.query;
