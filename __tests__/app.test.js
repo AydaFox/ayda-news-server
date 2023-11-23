@@ -366,7 +366,7 @@ describe("/api/articles", () => {
                     expect(body.articles).toHaveLength(10);
                 });
         });
-        test("GET:200 should respond with the first 10 articles (10 is the default)", ()=> {
+        test("GET:200 should respond with the first 5 articles", ()=> {
             return request(app)
                 .get("/api/articles?limit=5")
                 .expect(200)
@@ -420,7 +420,7 @@ describe("/api/articles", () => {
                     expect(body.msg).toBe("bad request");
                 });
         });
-        test("GET:404 should respond with an error if their is nothing on the selected page", () => {
+        test("GET:404 should respond with an error if there is nothing on the selected page", () => {
             return request(app)
                 .get("/api/articles?p=20")
                 .expect(404)
@@ -580,13 +580,13 @@ describe("/api/articles/:article_id", () => {
 });
 
 describe("/api/articles/:article_id/comments", () => {
-    test("GET:200 should respond with an array of comments for the given article_id, most recent first, with the correct properties", () => {
+    test("GET:200 should respond with an array of the first page of comments for the given article_id, 10 most recent first, with the correct properties", () => {
         return request(app)
             .get("/api/articles/1/comments")
             .expect(200)
             .then(({ body }) => {
                 const { comments } = body;
-                expect(comments).toHaveLength(11);
+                expect(comments).toHaveLength(10);
                 expect(comments).toBeSortedBy("created_at", { descending: true });
                 comments.forEach((comment) => {
                     expect(typeof comment.comment_id).toBe("number");
@@ -717,6 +717,105 @@ describe("/api/articles/:article_id/comments", () => {
             .then(({ body }) => {
                 expect(body.msg).toBe("foxesrule20XX not found");
             });
+    });
+    describe("?limit=", () => {
+        test("GET:200 should respond with the first 10 comments (10 is the default)", () => {
+            return request(app)
+                .get("/api/articles/1/comments?limit=10")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.comments).toHaveLength(10);
+                });
+        });
+        test("GET:200 should respond with the first 2 comments", () => {
+            return request(app)
+                .get("/api/articles/1/comments?limit=2")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.comments).toHaveLength(2);
+                });
+        });
+        test("GET:400 should respond with an error if the query is invalid", () => {
+            return request(app)
+                .get("/api/articles/1/comments?limit=ten")
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("bad request");
+                });
+        });
+    });
+    describe("?p=", () => {
+        test("GET:200 should respond with the first page of 10 comments", () => {
+            const expectedMissingComment = {
+                comment_id: 9,
+                votes: 0,
+                author: 'icellusedkars',
+                body: 'Superficially charming',
+                article_id: 1,
+                created_at: "2020-01-01T03:08:00.000Z"
+            };
+            return request(app)
+                .get("/api/articles/1/comments?p=1")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.comments).toHaveLength(10);
+                    body.comments.forEach((comment) => {
+                        expect(comment).not.toMatchObject(expectedMissingComment);
+                    });
+                });
+        });
+        test("GET:200 should respond with the second page of comments", () => {
+            return request(app)
+                .get("/api/articles/1/comments?p=2")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.comments).toHaveLength(1);
+                });
+        });
+        test("GET:200 should respond with the 4th page of comments when limit is 2", () => {
+            const expectedOne = {
+                comment_id: 6,
+                votes: 0,
+                author: 'icellusedkars',
+                body: 'I hate streaming eyes even more',
+                article_id: 1,
+                created_at: "2020-04-11T21:02:00.000Z"
+            };
+            const expectedTwo = {
+                comment_id: 12,
+                votes: 0,
+                author: 'icellusedkars',
+                body: 'Massive intercranial brain haemorrhage',
+                article_id: 1,
+                created_at: "2020-03-02T07:10:00.000Z"
+            }
+            return request(app)
+                .get("/api/articles/1/comments?p=4&limit=2")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.comments).toHaveLength(2);
+                    body.comments.forEach((comment, i) => {
+                        if (i === 0) expect(comment).toMatchObject(expectedOne);
+                        if (i === 1) expect(comment).toMatchObject(expectedTwo);
+                    })
+                });
+        });
+        test("GET:400 should respond with an error if the page query is invalid", () => {
+            return request(app)
+                .get("/api/articles/1/comments?p=twenty")
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("bad request");
+                });
+        });
+        test("GET:404 should respond with an error if there is nothing on the selected page", () => {
+            return request(app)
+                .get("/api/articles/1/comments?p=20")
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("comments not found");
+                });
+        });
     });
 });
 
