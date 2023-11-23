@@ -13,7 +13,11 @@ exports.handlePsqlErrors = (err, req, res, next) => {
     switch(err.code){
         case "22P02":
         case "42601":
+        case "23502":
             res.status(400).send({ msg: "bad request" });
+            break;
+        case "23503":
+            res.status(404).send({ msg: "not found" });
             break;
         default:
             next(err);
