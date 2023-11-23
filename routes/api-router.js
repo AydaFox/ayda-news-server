@@ -7,11 +7,11 @@ const userRouter = require("./users-router");
 
 apiRouter.get("/", getApi);
 
-apiRouter.use("/topics", topicRouter);
-
 apiRouter.use("/articles", articleRouter);
 
 apiRouter.use("/comments", commentRouter);
+
+apiRouter.use("/topics", topicRouter);
 
 apiRouter.use("/users", userRouter);
 
