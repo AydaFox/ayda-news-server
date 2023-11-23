@@ -180,6 +180,11 @@
         }
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes an article by article ID, along with all of its comments",
+    "queries": [],
+    "exampleResponse": "no content"
+  },
   "GET /api/articles/:article_id/comments": {
     "description": "serves all comments for the article, requested by article ID",
     "queries": [],

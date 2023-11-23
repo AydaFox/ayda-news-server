@@ -468,6 +468,37 @@ describe("/api/articles/:article_id", () => {
                 expect(body.msg).toBe("article not found");
             });
     });
+    test("DELETE:204 should delete an article by article_id, including all of its comments", () => {
+        return request(app)
+            .delete("/api/articles/6")
+            .expect(204)
+            .then(() => {
+                return db.query("SELECT * FROM articles WHERE article_id = 6");
+            })
+            .then(({ rows }) => {
+                expect(rows).toHaveLength(0);
+                return db.query("SELECT * FROM comments WHERE article_id = 6");
+            })
+            .then(({ rows }) => {
+                expect(rows).toHaveLength(0);
+            });
+    });
+    test("DELETE:404 should respond with an error if the article doesn't exist", () => {
+        return request(app)
+            .delete("/api/articles/50")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("article not found");
+            });
+    });
+    test("DELETE:400 should respond with an error if the article ID is invalid", () => {
+        return request(app)
+            .delete("/api/articles/bunnyrabbits")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
 });
 
 describe("/api/articles/:article_id/comments", () => {
