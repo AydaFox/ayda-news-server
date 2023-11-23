@@ -133,3 +133,12 @@ exports.addArticle = (author, title, body, topic, article_img_url) => {
                 return rows[0];
             });
 }
+
+exports.removeArticle = (article_id) => {
+    return db.query(`DELETE FROM articles WHERE article_id = $1 RETURNING *;`, [article_id])
+        .then(({ rows }) => {
+            if (!rows.length) {
+                return Promise.reject({ status: 404, msg: "article not found" });
+            }
+        });
+}
