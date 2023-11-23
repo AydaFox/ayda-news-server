@@ -272,7 +272,7 @@ describe("/api/articles/:article_id", () => {
                 expect(body.msg).toBe("bad request");
             });
     });
-    test("PATCH: 404 should respond with an error if the article doesn't exist", () => {
+    test("PATCH:404 should respond with an error if the article doesn't exist", () => {
         const voteChange = { inc_votes: 5 };
         return request(app)
             .patch("/api/articles/30")
