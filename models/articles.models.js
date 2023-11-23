@@ -1,10 +1,13 @@
 const db = require("../db/connection.js");
 
-exports.selectArticles = (topic, sort_by) => {
-    
+exports.selectArticles = (topic, sort_by, order) => {
     const validSorts = [ "article_id", "title", "topic", "author", "created_at", "votes" ];
-    if (sort_by && !validSorts.includes(sort_by)) {
-        return Promise.reject({});
+    const validOrder = [ "asc", "desc" ];
+    if (
+        sort_by && !validSorts.includes(sort_by) || 
+        order && !validOrder.includes(order)
+        ) {
+        return Promise.reject({ status: 400, msg: "bad request" });
     }
 
     let queryString = `
@@ -18,19 +21,19 @@ exports.selectArticles = (topic, sort_by) => {
                 articles.article_img_url, 
                 COUNT(comments.comment_id) AS comment_count
             FROM articles
-            LEFT JOIN comments ON articles.article_id = comments.article_id `
+            LEFT JOIN comments ON articles.article_id = comments.article_id `;
     
     if (topic) {
-        queryString += `WHERE topic = '${topic}' `
+        queryString += `WHERE topic = '${topic}' `;
     }
 
     queryString += `GROUP BY articles.article_id
-                    ORDER BY articles.${sort_by || "created_at"} DESC;`
+                    ORDER BY articles.${sort_by || "created_at"} ${order || "DESC"};`;
 
     return db.query(queryString)
         .then(({ rows }) => {
             return rows;
-        })
+        });
 }
 
 exports.selectArticleById = (article_id) => {
