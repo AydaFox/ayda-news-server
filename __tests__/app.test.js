@@ -34,6 +34,62 @@ describe("/api/topics", () => {
                 expect(body.msg).toBe("path not found");
             });
     });
+    test("POST:201 should respond with a newly added topic", () => {
+        const newTopic = {
+            slug: "foxes",
+            description: "Fluffy, cute and curious"
+        };
+        return request(app)
+            .post("/api/topics")
+            .send(newTopic)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.topic).toMatchObject(newTopic);
+            });
+    });
+    test("POST:201 should respond with a newly added topic, ignoring unnecessary request properties", () => {
+        const newTopic = {
+            slug: "foxes",
+            description: "Fluffy, cute and curious",
+            another_property: "some other string",
+            votes: 0
+        };
+        const expectedResponse = {
+            slug: "foxes",
+            description: "Fluffy, cute and curious",
+        };
+        return request(app)
+            .post("/api/topics")
+            .send(newTopic)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.topic).toMatchObject(expectedResponse);
+            });
+    });
+    test("POST:400 should respond with an error if no slug in request", () => {
+        const newTopic = {
+            description: "Fluffy, cute and curious"
+        };
+        return request(app)
+            .post("/api/topics")
+            .send(newTopic)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("POST:400 should respond with an error if no description in request", () => {
+        const newTopic = {
+            slug: "foxes",
+        };
+        return request(app)
+            .post("/api/topics")
+            .send(newTopic)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
 });
 
 describe("/api", () => {
