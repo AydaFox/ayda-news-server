@@ -453,6 +453,93 @@ describe("/api/comments/:comment_id", () => {
                 expect(body.msg).toBe("comment not found");
             });
     });
+    test("PATCH:200 should respond with the comment object with its votes increased", () => {
+        const voteChange = { inc_votes: 5 };
+        const expectedResponse = {
+            comment_id: 7,
+            votes: 5,
+            author: 'icellusedkars',
+            body: 'Lobster pot',
+            article_id: 1,
+            created_at: "2020-05-15T20:19:00.000Z"
+        };
+        return request(app)
+            .patch("/api/comments/7")
+            .send(voteChange)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comment).toMatchObject(expectedResponse)
+            });
+    });
+    test("PATCH:200 should respond with the comment object with its votes decreased, allowing for negative vote count", () => {
+        const voteChange = { inc_votes: -50 };
+        const expectedVotes = -50;
+        return request(app)
+            .patch("/api/comments/7")
+            .send(voteChange)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comment.votes).toBe(expectedVotes);
+            });
+    });
+    test("PATCH:200 should respond correctly, ignoring unnecessary request properties", () => {
+        const voteChange = { inc_votes: -50, update_body: "this is the new comment I'm making" };
+        const expectedResponse = {
+            comment_id: 7,
+            votes: -50,
+            author: 'icellusedkars',
+            body: 'Lobster pot',
+            article_id: 1,
+            created_at: "2020-05-15T20:19:00.000Z"
+        };
+        return request(app)
+            .patch("/api/comments/7")
+            .send(voteChange)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comment).toMatchObject(expectedResponse);
+            });
+    });
+    test("PATCH:404 should respond with an error if the comment doesn't exist", () => {
+        const voteChange = { inc_votes: 1 };
+        return request(app)
+            .patch("/api/comments/95")
+            .send(voteChange)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("comment not found");
+            });
+    });
+    test("PATCH:400 should respond with an error if the comment id is invalid", () => {
+        const voteChange = { inc_votes: 1 };
+        return request(app)
+            .patch("/api/comments/fifteen")
+            .send(voteChange)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("PATCH:400 should respond with an error if the request body doesn't contain inc_votes", () => {
+        const voteChange = { change_votes: 1 };
+        return request(app)
+            .patch("/api/comments/2")
+            .send(voteChange)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("PATCH:400 should respond with an error if the inc_votes is an invalid data type", () => {
+        const voteChange = { inc_votes: "fifty" };
+        return request(app)
+            .patch("/api/comments/2")
+            .send(voteChange)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
 });
 
 describe("/api/users", () => {
