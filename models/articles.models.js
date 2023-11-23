@@ -111,15 +111,37 @@ exports.insertComment = (author, body, article_id) => {
         });
 }
 
-exports.selectCommentsByArticleId = (article_id) => {
-    return db.query(`
+exports.selectCommentsByArticleId = (article_id, limit = 10, page = 1) => {
+    const validDigit = /^\d+$/;
+    if (!validDigit.test(limit) || !validDigit.test(page)) {
+        return Promise.reject({ status: 400, msg: "bad request" });
+    }
+
+    const offset = limit * (page-1);
+
+    let queryString = `
             SELECT *
             FROM comments
             WHERE article_id = $1
-            ORDER BY created_at DESC;`, [article_id])
-        .then(({ rows }) => {
-            return rows;
-        });
+            ORDER BY created_at DESC
+            LIMIT $2
+            OFFSET ${offset};`;
+
+    return db.query(`SELECT COUNT(comment_id) AS total_count 
+                    FROM comments WHERE article_id = $1;`, [article_id])
+                .then(({ rows }) => {
+                    total_comments = rows[0].total_count;
+                    if (total_comments && total_comments < offset) {
+                        return Promise.reject({ status: 404, msg: "comments not found" });
+                    } else {
+                        return db.query(queryString, [article_id, limit])
+                    }
+                })
+                .then(({ rows }) => {
+                    return rows;
+                });
+    
+    
 }
 
 exports.addArticle = (author, title, body, topic, article_img_url) => {
