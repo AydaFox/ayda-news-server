@@ -104,3 +104,32 @@ exports.selectCommentsByArticleId = (article_id) => {
             return rows;
         });
 }
+
+exports.addArticle = (author, title, body, topic, article_img_url) => {
+    const values = [
+        title,
+        topic,
+        author,
+        body,
+        0,
+        article_img_url,
+    ];
+    let column = ", article_img_url";
+    let value = ", $6";
+
+    if (!article_img_url) {
+        column = "";
+        value = "";
+        values.pop();
+    }
+    
+    return db.query(`
+            INSERT INTO articles
+                (title, topic, author, body, votes${column})
+            VALUES
+                ($1, $2, $3, $4, $5${value})
+            RETURNING *;`, values).then(({ rows }) => {
+                rows[0].comment_count = 0;
+                return rows[0];
+            });
+}

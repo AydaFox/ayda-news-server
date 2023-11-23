@@ -1,4 +1,4 @@
-const { selectArticles, selectArticleById, updateArticleVotes, selectCommentsByArticleId, insertComment } = require("../models/articles.models");
+const { selectArticles, selectArticleById, updateArticleVotes, selectCommentsByArticleId, insertComment, addArticle } = require("../models/articles.models");
 const { checkExists } = require("../models/utils.models");
 
 exports.getArticles = (req, res, next) => {
@@ -57,12 +57,29 @@ exports.postCommentToArticle = (req, res, next) => {
         selectArticleById(article_id).then(() => {
             return insertComment(username, body, article_id)
         }),
-        checkExists("users", "username", username)
+        username? checkExists("users", "username", username) : "no username query"
     ];
 
     Promise.all(promisesArray)
     .then(([comment]) => {
         res.status(201).send({ comment });
+    })
+    .catch(next);
+}
+
+exports.postArticle = (req, res, next) => {
+    const { author, title, body, topic, article_img_url } = req.body;
+
+    const promisesArray = [
+        author? checkExists("users", "username", author) : "no username author",
+        topic? checkExists("topics", "slug", topic) : "no topic query",
+    ];
+
+    Promise.all(promisesArray).then(() => {
+        return addArticle(author, title, body, topic, article_img_url);
+    })
+    .then((article) => {
+        res.status(201).send({ article });
     })
     .catch(next);
 }

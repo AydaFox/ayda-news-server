@@ -72,6 +72,136 @@ describe("/api/articles", () => {
                 });
             });
     });
+    test("POST:201 should respond with a newly posted article object and all correct properties", () => {
+        const expectedResponse = {
+            article_id: 14,
+            title: "Cutest cat begs for food",
+            topic: "cats",
+            author: "rogersop",
+            body: "this is the body of the article, look at how cute this cat is!",
+            votes: 0,
+            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: 0
+        };
+        const newArticle ={
+            author: "rogersop",
+            title: "Cutest cat begs for food",
+            body: "this is the body of the article, look at how cute this cat is!",
+            topic: "cats",
+            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        };
+        const timestamp = (new Date).toString()
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.article).toMatchObject(expectedResponse);
+                expect((new Date(body.article.created_at)).toString()).toBe(timestamp);
+            })
+    });
+    test("POST:201 should respond with a newly posted article object, with a default article_img_url if non given", () => {
+        const expectedUrl = "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+        const newArticle ={
+            author: "rogersop",
+            title: "Cutest cat begs for food",
+            body: "this is the body of the article, look at how cute this cat is!",
+            topic: "cats",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.article.article_img_url).toBe(expectedUrl);
+            });
+    });
+    test("POST:404 should respond with an error if the username does not exist", () => {
+        const newArticle ={
+            author: "foxesrule20XX",
+            title: "Cutest cat begs for food",
+            body: "this is the body of the article, look at how cute this cat is!",
+            topic: "cats",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("foxesrule20XX not found");
+            });
+    });
+    test("POST:404 should respond with an error if the topic does not exist", () => {
+        const newArticle ={
+            author: "rogersop",
+            title: "Cutest cat begs for food",
+            body: "this is the body of the article, look at how cute this cat is!",
+            topic: "dogs",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("dogs not found");
+            });
+    });
+    test("POST:400 should respond with an error if the request is missing title", () => {
+        const newArticle ={
+            author: "rogersop",
+            body: "this is the body of the article, look at how cute this cat is!",
+            topic: "cats",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("POST:400 should respond with an error if the request is missing author", () => {
+        const newArticle ={
+            title: "Cutest cat begs for food",
+            body: "this is the body of the article, look at how cute this cat is!",
+            topic: "cats",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("POST:400 should respond with an error if the request is missing body", () => {
+        const newArticle ={
+            author: "rogersop",
+            title: "Cutest cat begs for food",
+            topic: "cats",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
+    test("POST:400 should respond with an error if the request is missing topic", () => {
+        const newArticle ={
+            author: "rogersop",
+            title: "Cutest cat begs for food",
+            body: "this is the body of the article, look at how cute this cat is!",
+        };
+        return request(app)
+            .post("/api/articles")
+            .send(newArticle)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("bad request");
+            });
+    });
     describe("?topic=", () => {
         test("GET:200 should respond with an array of articles filtered by topic", () => {
             return request(app)
