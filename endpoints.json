@@ -197,5 +197,16 @@
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "serves a user object by username",
+    "queries": [],
+    "exampleResponse": {
+      "users": {
+          "username": "commenter09",
+          "name": "roger",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        }
+    }
   }
 }

@@ -471,3 +471,27 @@ describe("/api/users", () => {
             });
     });
 });
+
+describe("/api/users/:username", () => {
+    test("GET:200 should respond with a user object by username with the correct properties", () => {
+        const expectedResponse = {
+            username: "rogersop",
+            name: "paul",
+            avatar_url: "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        };
+        return request(app)
+            .get("/api/users/rogersop")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.user).toMatchObject(expectedResponse);
+            });
+    });
+    test("GET:404 should resond with an error if the user does not exist",() => {
+        return request(app)
+            .get("/api/users/taiga")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("user not found");
+            });
+    });
+});
