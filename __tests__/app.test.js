@@ -47,7 +47,7 @@ describe("/api", () => {
     });
 });
 
-describe.only("/api/articles", () => {
+describe("/api/articles", () => {
     test("GET:200 should respond with an articles array of article objects, with the correct properties and defaulted to ordering by date in descending order", () => {
         return request(app)
             .get("/api/articles")
