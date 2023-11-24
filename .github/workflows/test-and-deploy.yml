@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: PGDATABASE=testdb PGUSER=test_user PGPASSWORD=test_password npm test
+        run: PGDATABASE=test_db PGUSER=test_user PGPASSWORD=test_password npm test
 
   deploy:
     runs-on: ubuntu-latest
