@@ -60,7 +60,7 @@
   },
   "GET /api/articles?sort_by=": {
     "description": "serves an array of articles ordered by a valid article column in descending order",
-    "validQueries": ["article_id", "title", "topic", "author", "created_at", "votes"],
+    "validQueries": ["article_id", "title", "topic", "author", "created_at", "votes", "comment_count"],
     "exampleQuery": "/api/articles?sort_by=article_id",
     "exampleResponse": {
       "total_count": 2,
