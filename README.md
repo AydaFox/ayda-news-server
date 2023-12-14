@@ -23,15 +23,15 @@ Follow these steps in your terminal:
       - `npm install -D jest-extended`
       - `npm install -D jest-sorted`
       - `npm install -D supertest`
-3. Create and seed a local database
-   - `npm run setup-dbs`
-   - `npm run seed`
-4. Create 2 files in the root directory for the environment variables
+3. Create 2 files in the root directory for the environment variables
    - **.env.development**
    - **.env.test**
-5. Add the database names to the appropriate file
+4. Add the database names to the appropriate file
    - to **.env.development** add  `PGDATABASE=nc_news` 
    - to **.env.test** add  `PGDATABASE=nc_news_test` 
+5. Create and seed a local database
+   - `npm run setup-dbs`
+   - `npm run seed`
 
 Please ensure you have installed:
 - node v16 or later
