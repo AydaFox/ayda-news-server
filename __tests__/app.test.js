@@ -299,6 +299,16 @@ describe("/api/articles", () => {
                     expect(body.articles).toBeSortedBy("author", { descending: true });
                 });
         });
+        test("GET:200 should respond with an array of all articles sorted by the comment_count", () => {
+            return request(app)
+                .get("/api/articles?sort_by=comment_count")
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.total_count).toBe(13);
+                    expect(body.articles).toHaveLength(10);
+                    expect(body.articles).toBeSortedBy("comment_count", { descending: true, coerce: true });
+                });
+        });
         test("GET:400 should respond with an error message when given an invalid query of a column that doesn't exist", () => {
             return request(app)
                 .get("/api/articles?sort_by=foxes")

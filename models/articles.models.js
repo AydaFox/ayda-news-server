@@ -1,7 +1,7 @@
 const db = require("../db/connection.js");
 
 exports.selectArticles = (topic, sort_by, order, limit = 10, page = 1) => {
-    const validSorts = [ "article_id", "title", "topic", "author", "created_at", "votes" ];
+    const validSorts = [ "article_id", "title", "topic", "author", "created_at", "votes", "comment_count" ];
     const validOrder = [ "asc", "desc" ];
     const validDigit = /^\d+$/;
     if (
@@ -35,7 +35,7 @@ exports.selectArticles = (topic, sort_by, order, limit = 10, page = 1) => {
     const offset = limit * (page-1);
 
     queryString += `GROUP BY articles.article_id
-                    ORDER BY articles.${sort_by || "created_at"} ${order || "DESC"}
+                    ORDER BY ${sort_by || "created_at"} ${order || "DESC"}
                     LIMIT ${limit} 
                     OFFSET ${offset};`;
     
