@@ -8,7 +8,7 @@ Follow the link above to view all the available endpoints of the api.
 
 ## About
 
-This is my personal Backend project to create and host a news API, similar in functionality to how sites like Reddit work.
+This is my personal back end project to create and host a news API, similar in functionality to how sites like Reddit work.
 
 ## How to Setup and Run Locally
 
